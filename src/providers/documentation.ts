@@ -20,6 +20,7 @@ import { createLogger, get_configuration, get_extension_uri, make_docs_uri } fro
 import { globals } from "../extension";
 
 const log = createLogger("providers.docs");
+const logOutput = createLogger("providers.docs", { output: "Godot Document" });
 
 export class GDDocumentationProvider implements CustomReadonlyEditorProvider {
 	public classInfo = new Map<string, GodotNativeClassInfo>();
@@ -85,6 +86,24 @@ export class GDDocumentationProvider implements CustomReadonlyEditorProvider {
 	): Promise<void> {
 		const className = document.uri.path.split(".")[0];
 		const target = document.uri.fragment;
+
+		let extendedDocURL = `https://docs.godotengine.org/zh-cn/latest/classes/class_${className.toLowerCase()}.html`;
+		if (target.length > 0) {
+			let clsName = className.startsWith("@") ? className.substring(1) : className
+			let fragment = '';
+			if (target.startsWith('_')) {
+				fragment = `class-${clsName.toLowerCase()}-private-method-${target.substring(1).replaceAll('_', '-')}`
+			} else {
+				fragment = `class-${clsName.toLowerCase()}-method-${target.replaceAll('_', '-')}`
+			}
+			extendedDocURL += `#${fragment}`;
+		}
+		logOutput.info(`className is ${className}, target is "${target}", open ${extendedDocURL}`);
+		vscode.commands.executeCommand("simpleBrowser.show", extendedDocURL);
+
+		panel.dispose()
+		return;
+
 		let symbol: GodotNativeSymbol = null;
 
 		panel.webview.options = {
