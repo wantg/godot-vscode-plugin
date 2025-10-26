@@ -76,7 +76,7 @@ export class GDDocumentationProvider implements CustomReadonlyEditorProvider {
 		openContext: CustomDocumentOpenContext,
 		token: CancellationToken,
 	): CustomDocument {
-		return { uri: uri, dispose: () => {} };
+		return { uri: uri, dispose: () => { } };
 	}
 
 	public async resolveCustomEditor(
@@ -99,7 +99,8 @@ export class GDDocumentationProvider implements CustomReadonlyEditorProvider {
 			extendedDocURL += `#${fragment}`;
 		}
 		logOutput.info(`className is ${className}, target is "${target}", open ${extendedDocURL}`);
-		vscode.commands.executeCommand("simpleBrowser.show", extendedDocURL);
+		// vscode.commands.executeCommand("simpleBrowser.show", extendedDocURL);
+		vscode.env.openExternal(vscode.Uri.parse(extendedDocURL));
 
 		panel.dispose()
 		return;
